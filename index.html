@@ -374,11 +374,31 @@
     document.getElementById('gasDate').valueAsDate = today;
     document.getElementById('photoDate').valueAsDate = today;
 
-    let gasRecords = JSON.parse(localStorage.getItem('gas_records')) || [];
-    let photoRecords = JSON.parse(localStorage.getItem('photo_records')) || [];
+    let gasRecords = [];
+    let photoRecords = [];
 
     const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
     const circledWeekdays = { '日': '㈰', '月': '㈪', '火': '㈫', '水': '㈬', '木': '㈭', '金': '㈮', '土': '㈯' };
+
+    // 起動時に同じ階層の gas_photo_records.json を読み込む
+    async function initLoad() {
+        try {
+            const response = await fetch('gas_photo_records.json');
+            if (response.ok) {
+                const data = await response.json();
+                gasRecords = data.gas_records || [];
+                photoRecords = data.photo_records || [];
+                console.log('gas_photo_records.json を読み込みました');
+            } else {
+                throw new Error('ファイルが見つかりません');
+            }
+        } catch (error) {
+            console.log('ローカルストレージからデータを読み込みます（CORS制限またはファイル不存在のため）');
+            gasRecords = JSON.parse(localStorage.getItem('gas_records')) || [];
+            photoRecords = JSON.parse(localStorage.getItem('photo_records')) || [];
+        }
+        saveAndRender();
+    }
 
     function switchTab(type) {
         const gasTab = document.querySelectorAll('.tab-btn')[0];
@@ -627,7 +647,6 @@
             const dd = String(d.getDate()).padStart(2, '0');
             const wdayCircled = circledWeekdays[weekdays[d.getDay()]];
 
-            // 曜日の後に全角スペースを2文字分追加
             photoLines.push(`・${mm}/${dd}${wdayCircled}  ${r.content}`);
 
             photoHtml += `
@@ -659,7 +678,7 @@
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportDataObj, null, 2));
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `gas_photo_records_${todayStr}.json`);
+        downloadAnchor.setAttribute("download", `gas_photo_records.json`);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
@@ -697,10 +716,8 @@
         reader.readAsText(file);
     }
 
-    updateMonthSelector();
-    if(document.getElementById('selectMonth').value) {
-        render();
-    }
+    // 起動時の初期化実行
+    initLoad();
 </script>
 
 </body>
