@@ -1,1 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ガソリン代＆撮影きろく手帳 ⛽️📷</title>
+    <style>
+        :root {
+            --bg-color: #fff9fb;
+            --card-bg: #ffffff;
+            --primary-color: #ff8fab;
+            --primary-hover: #ff7597;
+            --text-color: #594a4e;
+            --border-color: #ffe5ed;
+            --accent-color: #ffb3c6;
+            --danger-color: #ff6b6b;
+            --danger-hover: #fa5252;
+            --edit-color: #4dabf7;
+            --edit-hover: #339af0;
+            --import-color: #9b5de5;
+            --import-hover: #7b2cbf;
+            --photo-color: #ffb703;
+            --photo-hover: #fb8500;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            max-width: 550px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(255, 143, 171, 0.15);
+            border: 2px solid var(--border-color);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        /* タブ切り替え */
+        .tab-menu {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: #ffe5ed;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            color: #8c787d;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 143, 171, 0.3);
+        }
+
+        .form-container {
+            background: #fff5f8;
+            padding: 16px;
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .form-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: #8c787d;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            color: var(--text-color);
+            background-color: #fffcfd;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            resize: vertical;
+            height: 60px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 143, 171, 0.3);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .photo-submit-btn {
+            background-color: var(--photo-color);
+            box-shadow: 0 4px 12px rgba(255, 183, 3, 0.3);
+        }
+        .photo-submit-btn:hover {
+            background-color: var(--photo-hover);
+        }
+
+        .cancel-btn {
+            background-color: #adb5bd;
+            box-shadow: 0 4px 12px rgba(173, 181, 189, 0.3);
+            display: none;
+        }
+        .cancel-btn:hover {
+            background-color: #868e96;
+        }
+
+        .data-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .export-btn {
+            background-color: #a0c4ff;
+            box-shadow: 0 4px 12px rgba(160, 196, 255, 0.3);
+            flex: 1;
+        }
+        .export-btn:hover { background-color: #8cadff; }
+
+        .import-btn {
+            background-color: var(--import-color);
+            box-shadow: 0 4px 12px rgba(155, 93, 229, 0.3);
+            flex: 1;
+        }
+        .import-btn:hover { background-color: var(--import-hover); }
+
+        #importFile { display: none; }
+
+        .output-area {
+            margin-top: 20px;
+            background-color: #fff9fb;
+            border-radius: 16px;
+            padding: 16px;
+            border: 2px dashed var(--border-color);
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .month-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .month-selector select {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: white;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        details {
+            margin-top: 15px;
+            background: #fff5f8;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #8c787d;
+            cursor: pointer;
+            user-select: none;
+            background: #ffe5ed;
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        summary:hover {
+            background: #ffd6e0;
+        }
+
+        .details-content {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .record-info { flex: 1; }
+        .record-actions { display: flex; gap: 4px; }
+
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        .btn-edit { background-color: var(--edit-color); }
+        .btn-edit:hover { background-color: var(--edit-hover); }
+        .btn-delete { background-color: var(--danger-color); }
+        .btn-delete:hover { background-color: var(--danger-hover); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⛽️📷 きろく手帳</h1>
+
+    <!-- 入力切り替えタブ -->
+    <div class="tab-menu">
+        <button class="tab-btn active" onclick="switchTab('gas')">⛽️ ガソリン代追加</button>
+        <button class="tab-btn" onclick="switchTab('photo')">📷 撮影記録追加</button>
+    </div>
+
+    <!-- ガソリン入力フォーム -->
+    <div id="gasFormContainer" class="form-container active">
+        <div id="gasFormTitle" class="form-title">✍️ ガソリン代きろく追加</div>
+        <input type="hidden" id="gasEditIndex" value="-1">
+        
+        <div class="form-group">
+            <label for="gasDate">📅 日付</label>
+            <input type="date" id="gasDate">
+        </div>
+        <div class="form-group">
+            <label for="price">💴 金額 (円)</label>
+            <input type="number" id="price" placeholder="例: 4005" oninput="calcUnit()">
+        </div>
+        <div class="form-group">
+            <label for="liter">💧 リッター (L)</label>
+            <input type="number" step="0.01" id="liter" placeholder="例: 28.01" oninput="calcUnit()">
+        </div>
+        <div class="form-group">
+            <label for="unitPrice">🏷️ リッター単価 (円)</label>
+            <input type="number" id="unitPrice" placeholder="自動計算されます">
+        </div>
+
+        <div class="btn-group">
+            <button id="gasSubmitBtn" onclick="saveGasRecord()">きろくする ✍️</button>
+            <button id="gasCancelBtn" class="cancel-btn" onclick="resetGasForm()">キャンセル</button>
+        </div>
+    </div>
+
+    <!-- 撮影記録入力フォーム -->
+    <div id="photoFormContainer" class="form-container">
+        <div id="photoFormTitle" class="form-title">📸 撮影記録追加</div>
+        <input type="hidden" id="photoEditIndex" value="-1">
+        
+        <div class="form-group">
+            <label for="photoDate">📅 日付</label>
+            <input type="date" id="photoDate">
+        </div>
+        <div class="form-group">
+            <label for="photoContent">📝 撮影内容</label>
+            <textarea id="photoContent" placeholder="例: 京都芸術花火"></textarea>
+        </div>
+
+        <div class="btn-group">
+            <button id="photoSubmitBtn" class="photo-submit-btn" onclick="savePhotoRecord()">撮影記録を保存 ✨</button>
+            <button id="photoCancelBtn" class="cancel-btn" onclick="resetPhotoForm()">キャンセル</button>
+        </div>
+    </div>
+
+    <!-- データ保存・読み込みボタン群 -->
+    <div class="data-buttons">
+        <button class="export-btn" onclick="exportData()">データ書き出し 📥</button>
+        <button class="import-btn" onclick="document.getElementById('importFile').click()">データ読み込み 📂</button>
+    </div>
+    <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+
+    <!-- 表示エリア -->
+    <div style="margin-top: 25px;">
+        <div class="month-selector">
+            <label for="selectMonth" style="margin:0;">表示月:</label>
+            <select id="selectMonth" onchange="render()"></select>
+        </div>
+        
+        <div id="output" class="output-area"></div>
+
+        <!-- プルダウン式：ガソリン代の管理 -->
+        <details>
+            <summary>⛽️ ガソリン代の管理（修正・削除）</summary>
+            <div class="details-content" id="gasRecordList"></div>
+        </details>
+
+        <!-- プルダウン式：撮影記録の管理 -->
+        <details>
+            <summary>📷 撮影記録の管理（修正・削除）</summary>
+            <div class="details-content" id="photoRecordList"></div>
+        </details>
+    </div>
+</div>
+
+<script>
+    const today = new Date();
+    document.getElementById('gasDate').valueAsDate = today;
+    document.getElementById('photoDate').valueAsDate = today;
+
+    let gasRecords = JSON.parse(localStorage.getItem('gas_records')) || [];
+    let photoRecords = JSON.parse(localStorage.getItem('photo_records')) || [];
+
+    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+    const circledWeekdays = { '日': '㈰', '月': '㈪', '火': '㈫', '水': '㈬', '木': '㈭', '金': '㈮', '土': '㈯' };
+
+    function switchTab(type) {
+        const gasTab = document.querySelectorAll('.tab-btn')[0];
+        const photoTab = document.querySelectorAll('.tab-btn')[1];
+        const gasForm = document.getElementById('gasFormContainer');
+        const photoForm = document.getElementById('photoFormContainer');
+
+        if (type === 'gas') {
+            gasTab.classList.add('active');
+            photoTab.classList.remove('active');
+            gasForm.classList.add('active');
+            photoForm.classList.remove('active');
+        } else {
+            photoTab.classList.add('active');
+            gasTab.classList.remove('active');
+            photoForm.classList.add('active');
+            gasForm.classList.remove('active');
+        }
+    }
+
+    function calcUnit() {
+        const price = parseFloat(document.getElementById('price').value);
+        const liter = parseFloat(document.getElementById('liter').value);
+        if (price && liter && liter > 0) {
+            document.getElementById('unitPrice').value = Math.round(price / liter);
+        }
+    }
+
+    function saveGasRecord() {
+        const date = document.getElementById('gasDate').value;
+        const price = document.getElementById('price').value;
+        const liter = document.getElementById('liter').value;
+        const unitPrice = document.getElementById('unitPrice').value;
+        const editIndex = parseInt(document.getElementById('gasEditIndex').value);
+
+        if (!date || !price || !liter) {
+            alert('日付、金額、リッターは必須です！');
+            return;
+        }
+
+        const data = {
+            date: date,
+            price: Number(price),
+            liter: Number(liter),
+            unitPrice: Number(unitPrice || Math.round(price / liter))
+        };
+
+        if (editIndex === -1) {
+            gasRecords.push(data);
+        } else {
+            gasRecords[editIndex] = data;
+            resetGasForm();
+        }
+
+        gasRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
+        saveAndRender();
+
+        if (editIndex === -1) {
+            document.getElementById('price').value = '';
+            document.getElementById('liter').value = '';
+            document.getElementById('unitPrice').value = '';
+        }
+    }
+
+    function savePhotoRecord() {
+        const date = document.getElementById('photoDate').value;
+        const content = document.getElementById('photoContent').value;
+        const editIndex = parseInt(document.getElementById('photoEditIndex').value);
+
+        if (!date || !content.trim()) {
+            alert('日付と撮影内容は必須です！');
+            return;
+        }
+
+        const data = {
+            date: date,
+            content: content.trim()
+        };
+
+        if (editIndex === -1) {
+            photoRecords.push(data);
+        } else {
+            photoRecords[editIndex] = data;
+            resetPhotoForm();
+        }
+
+        photoRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
+        saveAndRender();
+
+        if (editIndex === -1) {
+            document.getElementById('photoContent').value = '';
+        }
+    }
+
+    function editGasRecord(index) {
+        switchTab('gas');
+        const targetYM = document.getElementById('selectMonth').value;
+        const filtered = gasRecords.map((r, i) => ({ ...r, originalIndex: i })).filter(r => r.date.startsWith(targetYM));
+        const target = filtered[index];
+
+        document.getElementById('gasDate').value = target.date;
+        document.getElementById('price').value = target.price;
+        document.getElementById('liter').value = target.liter;
+        document.getElementById('unitPrice').value = target.unitPrice;
+        document.getElementById('gasEditIndex').value = target.originalIndex;
+
+        document.getElementById('gasFormTitle').textContent = '✏️ ガソリン代の修正中...';
+        document.getElementById('gasSubmitBtn').textContent = '更新する ✨';
+        document.getElementById('gasCancelBtn').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function editPhotoRecord(index) {
+        switchTab('photo');
+        const targetYM = document.getElementById('selectMonth').value;
+        const filtered = photoRecords.map((r, i) => ({ ...r, originalIndex: i })).filter(r => r.date.startsWith(targetYM));
+        const target = filtered[index];
+
+        document.getElementById('photoDate').value = target.date;
+        document.getElementById('photoContent').value = target.content;
+        document.getElementById('photoEditIndex').value = target.originalIndex;
+
+        document.getElementById('photoFormTitle').textContent = '✏️ 撮影記録の修正中...';
+        document.getElementById('photoSubmitBtn').textContent = '更新する ✨';
+        document.getElementById('photoCancelBtn').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteGasRecord(index) {
+        const targetYM = document.getElementById('selectMonth').value;
+        const filtered = gasRecords.map((r, i) => ({ ...r, originalIndex: i })).filter(r => r.date.startsWith(targetYM));
+        if (confirm('このガソリン代の記録を削除しますか？')) {
+            gasRecords.splice(filtered[index].originalIndex, 1);
+            saveAndRender();
+        }
+    }
+
+    function deletePhotoRecord(index) {
+        const targetYM = document.getElementById('selectMonth').value;
+        const filtered = photoRecords.map((r, i) => ({ ...r, originalIndex: i })).filter(r => r.date.startsWith(targetYM));
+        if (confirm('この撮影記録を削除しますか？')) {
+            photoRecords.splice(filtered[index].originalIndex, 1);
+            saveAndRender();
+        }
+    }
+
+    function resetGasForm() {
+        document.getElementById('gasEditIndex').value = '-1';
+        document.getElementById('gasFormTitle').textContent = '✍️ ガソリン代きろく追加';
+        document.getElementById('gasSubmitBtn').textContent = 'きろくする ✍️';
+        document.getElementById('gasCancelBtn').style.display = 'none';
+        document.getElementById('price').value = '';
+        document.getElementById('liter').value = '';
+        document.getElementById('unitPrice').value = '';
+        document.getElementById('gasDate').valueAsDate = new Date();
+    }
+
+    function resetPhotoForm() {
+        document.getElementById('photoEditIndex').value = '-1';
+        document.getElementById('photoFormTitle').textContent = '📸 撮影記録追加';
+        document.getElementById('photoSubmitBtn').textContent = '撮影記録を保存 ✨';
+        document.getElementById('photoCancelBtn').style.display = 'none';
+        document.getElementById('photoContent').value = '';
+        document.getElementById('photoDate').valueAsDate = new Date();
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('gas_records', JSON.stringify(gasRecords));
+        localStorage.setItem('photo_records', JSON.stringify(photoRecords));
+        updateMonthSelector();
+        render();
+    }
+
+    function updateMonthSelector() {
+        const select = document.getElementById('selectMonth');
+        const allDates = [...gasRecords.map(r => r.date), ...photoRecords.map(r => r.date)];
+        const months = [...new Set(allDates.map(d => d.slice(0, 7)))];
+        
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        if (!months.includes(currentMonth)) {
+            months.push(currentMonth);
+        }
+        months.sort().reverse();
+
+        const currentSelected = select.value;
+        select.innerHTML = '';
+        months.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = m.replace('-', '年') + '月';
+            select.appendChild(opt);
+        });
+
+        if (months.includes(currentSelected)) {
+            select.value = currentSelected;
+        }
+    }
+
+    function render() {
+        const targetYM = document.getElementById('selectMonth').value;
+        const outputDiv = document.getElementById('output');
+        const gasListDiv = document.getElementById('gasRecordList');
+        const photoListDiv = document.getElementById('photoRecordList');
+
+        if (!targetYM) {
+            outputDiv.textContent = 'データがありません 🚗';
+            gasListDiv.innerHTML = '<div style="font-size:0.8rem; color:#aaa; padding:4px;">データなし</div>';
+            photoListDiv.innerHTML = '<div style="font-size:0.8rem; color:#aaa; padding:4px;">データなし</div>';
+            return;
+        }
+
+        const filteredGas = gasRecords.filter(r => r.date.startsWith(targetYM));
+        const filteredPhoto = photoRecords.filter(r => r.date.startsWith(targetYM));
+        const [year, month] = targetYM.split('-');
+        
+        let totalYen = 0;
+        let gasLines = [];
+        let gasHtml = '';
+
+        filteredGas.forEach((r, idx) => {
+            totalYen += r.price;
+            const d = new Date(r.date);
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const wdayCircled = circledWeekdays[weekdays[d.getDay()]];
+
+            gasLines.push(`・${mm}/${dd}${wdayCircled}  ${r.price.toLocaleString()}円 ${r.liter.toFixed(2)}L @${r.unitPrice}`);
+
+            gasHtml += `
+                <div class="record-item">
+                    <div class="record-info"><strong>${mm}/${dd}</strong> ${r.price.toLocaleString()}円 (${r.liter}L)</div>
+                    <div class="record-actions">
+                        <button class="action-btn btn-edit" onclick="editGasRecord(${idx})">修正</button>
+                        <button class="action-btn btn-delete" onclick="deleteGasRecord(${idx})">削除</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        let photoLines = [];
+        let photoHtml = '';
+
+        filteredPhoto.forEach((r, idx) => {
+            const d = new Date(r.date);
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const wdayCircled = circledWeekdays[weekdays[d.getDay()]];
+
+            // 曜日の後に全角スペースを2文字分追加
+            photoLines.push(`・${mm}/${dd}${wdayCircled}  ${r.content}`);
+
+            photoHtml += `
+                <div class="record-item">
+                    <div class="record-info"><strong>${mm}/${dd}</strong> ${r.content}</div>
+                    <div class="record-actions">
+                        <button class="action-btn btn-edit" onclick="editPhotoRecord(${idx})">修正</button>
+                        <button class="action-btn btn-delete" onclick="deletePhotoRecord(${idx})">削除</button>
+                    </div>
+                </div>
+            `;
+        });
+
+        let resultText = `▼${year}年${month}月ガソリン代\n（計：${totalYen.toLocaleString()}円）\n` + gasLines.join('\n');
+        
+        if (photoLines.length > 0) {
+            resultText += `\n\n▼撮影記録\n` + photoLines.join('\n');
+        }
+
+        outputDiv.textContent = resultText;
+        gasListDiv.innerHTML = gasHtml || '<div style="font-size:0.8rem; color:#aaa; padding:4px;">データなし</div>';
+        photoListDiv.innerHTML = photoHtml || '<div style="font-size:0.8rem; color:#aaa; padding:4px;">データなし</div>';
+    }
+
+    function exportData() {
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const exportDataObj = { gas_records: gasRecords, photo_records: photoRecords };
+        
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportDataObj, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `gas_photo_records_${todayStr}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (Array.isArray(imported)) {
+                    if (confirm('ガソリン代のデータが見つかりました。復元しますか？')) {
+                        gasRecords = imported;
+                        saveAndRender();
+                        alert('復元完了しました！✨');
+                    }
+                } else if (imported.gas_records || imported.photo_records) {
+                    if (confirm('ガソリン代と撮影記録のデータを復元しますか？')) {
+                        gasRecords = imported.gas_records || [];
+                        photoRecords = imported.photo_records || [];
+                        saveAndRender();
+                        alert('復元完了しました！✨');
+                    }
+                } else {
+                    alert('ファイルの形式が正しくないようです。');
+                }
+            } catch (error) {
+                alert('JSONファイルの読み込みに失敗しました。');
+            }
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    updateMonthSelector();
+    if(document.getElementById('selectMonth').value) {
+        render();
+    }
+</script>
+
+</body>
+</html>
